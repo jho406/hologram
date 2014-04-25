@@ -58,14 +58,19 @@ module Hologram
     private
 
     def set_dirs
-      @output_dir = real_path(destination)
-      @doc_assets_dir = real_path(documentation_assets)
-      @input_dir = real_path(source)
+      @output_dir = real_dir_path(destination)
+      @doc_assets_dir = real_dir_path(documentation_assets)
+      @input_dir = real_dir_path(source)
     end
 
-    def real_path(dir)
+    def real_dir_path(dir)
       return if !File.directory?(String(dir))
       Pathname.new(dir).realpath
+    end
+
+    def real_file_path(filepath)
+      return if !File.exists?(filepath)
+      Pathname.new(filepath).realpath
     end
 
     def build_docs
@@ -128,24 +133,16 @@ module Hologram
     end
 
     def set_header_footer
-      # load the markdown renderer we are going to use
+      ['header', 'footer'].each do |section|
+        deprecated_name = "#{doc_assets_dir}/#{section}.html"
+        filename = "#{doc_assets_dir}/_#{section}.html"
+        erb_file = real_file_path(filename) || real_file_path(deprecated_name)
 
-      if File.exists?("#{doc_assets_dir}/_header.html")
-        @header_erb = ERB.new(File.read("#{doc_assets_dir}/_header.html"))
-      elsif File.exists?("#{doc_assets_dir}/header.html")
-        @header_erb = ERB.new(File.read("#{doc_assets_dir}/header.html"))
-      else
-        @header_erb = nil
-        DisplayMessage.warning("No _header.html found in documentation assets. Without this your css/header will not be included on the generated pages.")
-      end
+        erb = ERB.new(File.read(erb_file)) if erb_file
+        instance_variable_set("@#{section}_erb", erb)
 
-      if File.exists?("#{doc_assets_dir}/_footer.html")
-        @footer_erb = ERB.new(File.read("#{doc_assets_dir}/_footer.html"))
-      elsif File.exists?("#{doc_assets_dir}/footer.html")
-        @footer_erb = ERB.new(File.read("#{doc_assets_dir}/footer.html"))
-      else
-        @footer_erb = nil
-        DisplayMessage.warning("No _footer.html found in documentation assets. This might be okay to ignore...")
+        next if erb_file
+        DisplayMessage.warning("No _#{section}.html found in documentation assets. Without this your css/header will not be included on the generated pages.")
       end
     end
 
