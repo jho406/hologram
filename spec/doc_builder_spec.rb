@@ -50,42 +50,6 @@ describe Hologram::DocBuilder do
     end
   end
 
-  context '.setup_dir' do
-    subject(:builder) { Hologram::DocBuilder }
-
-    around do |example|
-      Dir.mktmpdir do |dir|
-        Dir.chdir(dir) do
-          example.run
-        end
-      end
-    end
-
-    before do
-      builder.setup_dir
-    end
-
-    it 'creates a config file' do
-      expect(File.exists?('hologram_config.yml')).to be_true
-    end
-
-    it 'creates default assets' do
-      Dir.chdir('doc_assets') do
-        ['_header.html', '_footer.html'].each do |asset|
-          expect(File.exists?(asset)).to be_true
-        end
-      end
-    end
-
-    context 'when a hologram_config.yml already exists' do
-      it 'does nothing' do
-        open('hologram_config.yml', 'w') {|io|io << 'foo'}
-        builder.setup_dir
-        expect(IO.read('hologram_config.yml')).to eql('foo')
-      end
-    end
-  end
-
   context '#is_valid?' do
 
     let(:config) do

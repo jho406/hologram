@@ -10,7 +10,7 @@ describe Hologram::CLI do
       let(:argv) { ['init'] }
 
       it 'setups the dir' do
-        expect(Hologram::DocBuilder).to receive(:setup_dir)
+        expect(Hologram::Utils).to receive(:setup_dir)
         cli.run
       end
     end
