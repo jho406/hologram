@@ -17,17 +17,6 @@ module Hologram
       raise SyntaxError, "Could not load config file, check the syntax or try 'hologram init' to get started"
     end
 
-    def self.setup_dir
-      if File.exists?("hologram_config.yml")
-        DisplayMessage.warning("Cowardly refusing to overwrite existing hologram_config.yml")
-        return
-      end
-
-      FileUtils.cp_r INIT_TEMPLATE_FILES, Dir.pwd
-      new_files = ["hologram_config.yml", "doc_assets/", "doc_assets/_header.html", "doc_assets/_footer.html"]
-      DisplayMessage.created(new_files)
-    end
-
     def initialize(options)
       @pages = {}
       @errors = []

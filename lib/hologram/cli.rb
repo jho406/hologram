@@ -24,7 +24,7 @@ module Hologram
     end
 
     def setup
-      DocBuilder.setup_dir
+      Hologram::Utils.setup_dir
     rescue => e
       DisplayMessage.error("#{e}")
     end
